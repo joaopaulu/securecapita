@@ -5,24 +5,38 @@ import io.getarrays.securecapita.exception.ApiException;
 import io.getarrays.securecapita.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+
+import static io.getarrays.securecapita.query.UserQuery.*;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> {
 
-    private static final String COUNT_USER_EMAIL_QUERY = "";
     private final NamedParameterJdbcTemplate jdbc;
 
     @Override
     public User create(User user) {
         if(getEmailCount(user.getEmail().trim().toLowerCase()) > 0){
             throw new ApiException("Email already in use. Please use a different email and try again");
+        }
+        try {
+            KeyHolder holder = new GeneratedKeyHolder();
+            SqlParameterSource parameterSource = getSqlParameterSource(user);
+            jdbc.update(INSERT_USER_QUERY, parameterSource, holder);
+            user.setId(Objects.requireNonNull(holder.getKey()).longValue());
+        }catch (EmptyResultDataAccessException exception){
+
         }
         return null;
     }
@@ -49,5 +63,9 @@ public class UserRepositoryImpl implements UserRepository<User> {
 
     private Integer getEmailCount(String email){
         return jdbc.queryForObject(COUNT_USER_EMAIL_QUERY, Map.of("email", email), Integer.class);
+    }
+
+    private SqlParameterSource getSqlParameterSource(User user){
+        return null;
     }
 }
