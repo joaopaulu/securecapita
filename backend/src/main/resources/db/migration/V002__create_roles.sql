@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS Roles;
+
+CREATE TABLE Roles
+(
+    id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(50) NOT NULL,
+    permission VARCHAR(255) NOT NULL,
+    CONSTRAINT UQ_Roles_Name UNIQUE (name)
+);
