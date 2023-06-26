@@ -1,10 +1,13 @@
 package io.getarrays.securecapita.repository.implementation;
 
+import io.getarrays.securecapita.domain.model.Role;
 import io.getarrays.securecapita.domain.model.User;
 import io.getarrays.securecapita.exception.ApiException;
+import io.getarrays.securecapita.repository.RoleRepository;
 import io.getarrays.securecapita.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -16,7 +19,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.getarrays.securecapita.query.UserQuery.*;
+import static io.getarrays.securecapita.domain.enumeration.RoleType.ROLE_USER;
+import static io.getarrays.securecapita.query.UserQuery.COUNT_USER_EMAIL_QUERY;
+import static io.getarrays.securecapita.query.UserQuery.INSERT_USER_QUERY;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,6 +29,8 @@ import static io.getarrays.securecapita.query.UserQuery.*;
 public class UserRepositoryImpl implements UserRepository<User> {
 
     private final NamedParameterJdbcTemplate jdbc;
+
+    private final RoleRepository<Role> roleRepository;
 
     @Override
     public User create(User user) {
@@ -35,6 +42,7 @@ public class UserRepositoryImpl implements UserRepository<User> {
             SqlParameterSource parameterSource = getSqlParameterSource(user);
             jdbc.update(INSERT_USER_QUERY, parameterSource, holder);
             user.setId(Objects.requireNonNull(holder.getKey()).longValue());
+            roleRepository.addRoleToUser(user.getId(), ROLE_USER.name());
         }catch (EmptyResultDataAccessException exception){
 
         }
