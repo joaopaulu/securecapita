@@ -42,4 +42,19 @@ public class RoleRepositoryImpl implements RoleRepository<Role> {
     public void addRoleToUser(Long userId, String roleName) {
 
     }
+
+    @Override
+    public Role getRoleByUserId(Long userId) {
+        return null;
+    }
+
+    @Override
+    public Role getRoleByUserEmail(String eemail) {
+        return null;
+    }
+
+    @Override
+    public void updateUserRole(Long userId, String roleName) {
+
+    }
 }
