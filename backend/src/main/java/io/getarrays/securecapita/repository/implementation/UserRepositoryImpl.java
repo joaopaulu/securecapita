@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static io.getarrays.securecapita.constant.UserExceptionConstant.*;
 import static io.getarrays.securecapita.domain.enumeration.RoleType.ROLE_USER;
 import static io.getarrays.securecapita.domain.enumeration.VerificationType.ACCOUNT;
 import static io.getarrays.securecapita.query.UserQuery.*;
@@ -39,7 +40,7 @@ public class UserRepositoryImpl implements UserRepository<User> {
     @Override
     public User create(User user) {
         if (getEmailCount(user.getEmail().trim().toLowerCase()) > 0) {
-            throw new ApiException("Email already in use. Please use a different email and try again");
+            throw new ApiException(EMAIL_IN_USE);
         }
         try {
             KeyHolder holder = new GeneratedKeyHolder();
@@ -54,9 +55,9 @@ public class UserRepositoryImpl implements UserRepository<User> {
             user.setNotLocked(true);
             return user;
         } catch (EmptyResultDataAccessException exception) {
-            throw new ApiException("No role found by name: " + ROLE_USER.name());
+            throw new ApiException(String.format(ROLE_NOT_FOUND, ROLE_USER.name()));
         } catch (Exception exception) {
-            throw new ApiException("An error occurred. Please try again.");
+            throw new ApiException(ERROR_OCCURRED);
         }
 
     }
