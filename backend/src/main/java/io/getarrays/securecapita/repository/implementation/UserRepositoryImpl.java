@@ -7,7 +7,6 @@ import io.getarrays.securecapita.repository.RoleRepository;
 import io.getarrays.securecapita.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -22,11 +21,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static io.getarrays.securecapita.constant.UserExceptionConstant.*;
+import static io.getarrays.securecapita.constant.UserExceptionConstant.EMAIL_IN_USE;
+import static io.getarrays.securecapita.constant.UserExceptionConstant.ERROR_OCCURRED;
 import static io.getarrays.securecapita.domain.enumeration.RoleType.ROLE_USER;
 import static io.getarrays.securecapita.domain.enumeration.VerificationType.ACCOUNT;
 import static io.getarrays.securecapita.query.UserQuery.*;
-
 
 @Repository
 @RequiredArgsConstructor
@@ -54,8 +53,6 @@ public class UserRepositoryImpl implements UserRepository<User> {
             user.setEnabled(false);
             user.setNotLocked(true);
             return user;
-        } catch (EmptyResultDataAccessException exception) {
-            throw new ApiException(String.format(ROLE_NOT_FOUND, ROLE_USER.name()));
         } catch (Exception exception) {
             throw new ApiException(ERROR_OCCURRED);
         }
