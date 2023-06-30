@@ -3,7 +3,7 @@ package io.getarrays.securecapita.repository.implementation;
 import io.getarrays.securecapita.domain.model.Role;
 import io.getarrays.securecapita.exception.ApiException;
 import io.getarrays.securecapita.repository.RoleRepository;
-import io.getarrays.securecapita.rowmapper.RoleRowMapper;
+import io.getarrays.securecapita.config.rowmapper.RoleRowMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;

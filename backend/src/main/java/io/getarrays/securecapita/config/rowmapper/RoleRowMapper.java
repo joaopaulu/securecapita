@@ -1,4 +1,4 @@
-package io.getarrays.securecapita.rowmapper;
+package io.getarrays.securecapita.config.rowmapper;
 
 import io.getarrays.securecapita.domain.model.Role;
 import org.springframework.jdbc.core.RowMapper;
