@@ -26,6 +26,7 @@ import static io.getarrays.securecapita.constant.UserExceptionConstant.ERROR_OCC
 import static io.getarrays.securecapita.domain.enumeration.RoleType.ROLE_USER;
 import static io.getarrays.securecapita.domain.enumeration.VerificationType.ACCOUNT;
 import static io.getarrays.securecapita.query.UserQuery.*;
+import static java.util.Objects.requireNonNull;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,17 +44,18 @@ public class UserRepositoryImpl implements UserRepository<User> {
         }
         try {
             KeyHolder holder = new GeneratedKeyHolder();
-            SqlParameterSource parameterSource = getSqlParameterSource(user);
-            jdbc.update(INSERT_USER_QUERY, parameterSource, holder);
-            user.setId(Objects.requireNonNull(holder.getKey()).longValue());
+            SqlParameterSource parameters = getSqlParameterSource(user);
+            jdbc.update(INSERT_USER_QUERY, parameters, holder);
+            user.setId(requireNonNull(holder.getKey()).longValue());
             roleRepository.addRoleToUser(user.getId(), ROLE_USER.name());
             String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
             jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY, Map.of("userId", user.getId(), "url", verificationUrl));
-            //emailService.sendVerificationUrl(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT.getType());
+            //emailService.sendVerificationUrl(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT);
             user.setEnabled(false);
             user.setNotLocked(true);
             return user;
         } catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new ApiException(ERROR_OCCURRED);
         }
 
@@ -92,6 +94,6 @@ public class UserRepositoryImpl implements UserRepository<User> {
     }
 
     private String getVerificationUrl(String key, String type) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/verify" + type + key).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/verify/" + type + "/" + key).toUriString();
     }
 }
